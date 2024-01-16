@@ -49,8 +49,6 @@
         waybar-cfg = import ./waybar-config.nix { inherit config pkgs lib; };
       in
       {
-        "sway/config".text = import ./sway-config.nix { inherit config pkgs lib; };
-        #"sway/config".text = "";
         "xdg/waybar/config".text = waybar-cfg.config;
         "xdg/waybar/style.css".text = waybar-cfg.css;
       };
