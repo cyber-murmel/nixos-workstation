@@ -1,0 +1,30 @@
+From d760cd95e89b80d65dea700110cc873afa05f90e Mon Sep 17 00:00:00 2001
+From: Bjoern Kerler <info@revskills.de>
+Date: Wed, 31 Jul 2019 00:01:02 +0200
+Subject: [PATCH] Fix SoapySDR division by zero issue on frequency set before
+ samplerate set
+
+---
+ xtrx.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/xtrx.c b/xtrx.c
+index 74d1d95..561b810 100644
+--- a/xtrx.c
++++ b/xtrx.c
+@@ -352,6 +352,15 @@ int xtrx_open(const char* device, unsigned flags, struct xtrx_dev** outdev)
+ 	}
+
+ 	*outdev = dev;
++
++	/* We need to set a samplerate, otherwise if we set frequency first, it will crash due to a divide of fref by zero.*/
++    unsigned int MIN_TX_RATE = 2100000;
++    double master_clock;
++    double _actual_rx_rate;
++    double _actual_tx_rate;
++    int ret = xtrx_set_samplerate(dev, 0, MIN_TX_RATE, MIN_TX_RATE,
++                                  0, //XTRX_SAMPLERATE_FORCE_UPDATE,
++                                  &master_clock, &_actual_rx_rate, &_actual_tx_rate);
+ 	return 0;
+
+

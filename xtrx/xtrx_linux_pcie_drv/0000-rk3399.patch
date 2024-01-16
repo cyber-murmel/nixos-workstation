@@ -1,0 +1,14 @@
+diff --git a/xtrx.c b/xtrx.c
+index c9ac97b..b0385e8 100644
+--- a/xtrx.c
++++ b/xtrx.c
+@@ -177,7 +177,9 @@ MODULE_VERSION("0.1");
+  * mmaped to userspce. Convertion DMA->PA->VA does the trick on that
+  * platforms
+  */
++#define CONFIG_CPU_RK3399
+ #ifdef CONFIG_CPU_RK3399
++#include <linux/dma-direct.h>
+ #define VA_DMA_ADDR_FIXUP
+ #endif
+ 
