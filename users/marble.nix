@@ -156,11 +156,12 @@ in
   home-manager.users.marble = {
     nixpkgs.config.allowUnfree = true;
     home = {
-      # sessionVariables = {
-      #   XDG_CURRENT_DESKTOP = "sway";
-      #   XDG_SESSION_TYPE = "wayland";
-      #   _JAVA_AWT_WM_NONREPARENTING = "1";
-      # };
+      sessionVariables = {
+        # XDG_CURRENT_DESKTOP = "sway";
+        # XDG_SESSION_TYPE = "wayland";
+        # _JAVA_AWT_WM_NONREPARENTING = "1";
+        MOZ_ENABLE_WAYLAND = "1";
+      };
 
       packages = with pkgs; [
         (firefox-wayland.override {
@@ -216,23 +217,71 @@ in
       stateVersion = config.system.stateVersion;
     };
 
-    programs.vscode = {
-      enable = true;
-      # package = pkgs.vscodium;
-      extensions = with pkgs.vscode-extensions; [
-        dracula-theme.theme-dracula
-        yzhang.markdown-all-in-one
-        bbenoist.nix
-        github.copilot
-        eamodio.gitlens
-        antyos.openscad
-        ms-python.python
-        ms-vsliveshare.vsliveshare
-        ms-vscode.cmake-tools
-        twxs.cmake
-        ms-vscode.makefile-tools
-        ms-vscode.cpptools
-      ];
+    gtk.enable = true;
+    
+    services = {
+      swayidle = with pkgs;{
+        # This will lock the screen after 300 seconds of inactivity, then turn off
+        # the displays after another 300 seconds, and turn the screens back on when
+        # resumed. It will also lock the screen before the computer goes to sleep.
+        enable = true;
+        timeouts = [
+          {
+            timeout = 300;
+            command = "${swaylock}/bin/swaylock -f -c 000000";
+          }
+          {
+            timeout = 600;
+            command = "${sway}/bin/swaymsg \"output * dpms off\"";
+            resumeCommand = "${sway}/bin/swaymsg \"output * dpms on\"";
+          }
+        ];
+        events = [
+          {
+            event = "before-sleep";
+            command = "${swaylock}/bin/swaylock -f -c 000000";
+          }
+        ];
+      };
+      blueman-applet.enable = true;
+      network-manager-applet.enable = true;
+    };
+
+    programs = {
+      zsh = {
+        enable = true;
+        # interactiveShellInit = ''
+        #   source ${pkgs.grml-zsh-config}/etc/zsh/zshrc
+        # '';
+        # promptInit = ""; # otherwise it'll override the grml prompt
+        history.size = 1000000;
+        oh-my-zsh = {
+          enable = true;
+          plugins = [ "git" "sudo" ];
+          theme = "robbyrussell";
+        };
+      };
+
+      waybar.enable = true;
+
+      vscode = {
+        enable = true;
+        # package = pkgs.vscodium;
+        extensions = with pkgs.vscode-extensions; [
+          dracula-theme.theme-dracula
+          yzhang.markdown-all-in-one
+          bbenoist.nix
+          github.copilot
+          eamodio.gitlens
+          antyos.openscad
+          ms-python.python
+          ms-vsliveshare.vsliveshare
+          ms-vscode.cmake-tools
+          twxs.cmake
+          ms-vscode.makefile-tools
+          ms-vscode.cpptools
+        ];
+      };
     };
 
     wayland.windowManager.sway = import ./sway-config.nix { inherit pkgs; };

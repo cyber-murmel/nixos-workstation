@@ -7,11 +7,11 @@
 
   programs.zsh = {
     enable = true;
-    interactiveShellInit = ''
-      source ${pkgs.grml-zsh-config}/etc/zsh/zshrc
-    '';
-    promptInit = ""; # otherwise it'll override the grml prompt
-    histSize = 1000000;
+    # interactiveShellInit = ''
+    #   source ${pkgs.grml-zsh-config}/etc/zsh/zshrc
+    # '';
+    # promptInit = ""; # otherwise it'll override the grml prompt
+    # histSize = 1000000;
   };
 
   users = {
